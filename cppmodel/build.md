@@ -12,5 +12,5 @@ make
 ```
 download stable-code-3b.gguf from url [stable code 3b](https://huggingface.co/stabilityai/stable-code-3b/tree/main)
 ```
-./main -m ~/Downloads/stable-code-3b.gguf -n -1 -p "write a bubble sort in c" 
+./main -m model/stable-code-3b.gguf -n -1 -p "write a bubble sort in c" 
 ```

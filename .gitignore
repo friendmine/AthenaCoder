@@ -1,0 +1,6 @@
+extensions/athenacoder/node_modules
+extensions/athenacoder/.vscode
+extensions/athenacoder/yarn.lock
+.DS_Store
+.vscode/
+

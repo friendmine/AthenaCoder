@@ -1,9 +1,12 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import * as path from 'path';
+import { exec } from 'child_process';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
+/*
 export function activate(context: vscode.ExtensionContext) {
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
@@ -21,6 +24,22 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(disposable);
 }
+*/
+export function activate(context: vscode.ExtensionContext) {
+	let disposable = vscode.commands.registerCommand('athenacoder.helloWorld', () => {
+        const extensionPath = context.extensionPath;
+        const executablePath = path.join(extensionPath, 'resources', 'main');
+        const modelPath = path.join(extensionPath, 'resources', 'stable-code-3b.gguf');
+
+        const command = `${executablePath} -m ${modelPath} -n -1 -p "write a bubble sort in c"`;
+
+        exec(command, (error, stdout, stderr) => {
+            // ... handle the output
+        });
+    });
+  
+	context.subscriptions.push(disposable);
+  }
 
 // This method is called when your extension is deactivated
 export function deactivate() {}

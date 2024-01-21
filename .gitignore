@@ -3,6 +3,7 @@ extensions/athenacoder/.vscode
 extensions/athenacoder/yarn.lock
 model/stable-code-3b.gguf
 cppmodel/main.log
+extensions/athenacoder/resources/main/stable-code-3b.gguf
 .DS_Store
 .vscode/
 

@@ -17,6 +17,9 @@
         "command": "athenacoder.helloWorld",
         "title": "Hello World"
       }
+    ],
+    "activationEvents": [
+      "onCommand:athenacoder.helloWorld"
     ]
   },
   "scripts": {

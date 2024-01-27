@@ -33,8 +33,8 @@ exports.deactivate = exports.activate = void 0;
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 const vscode = __importStar(__webpack_require__(1));
-const path = __importStar(__webpack_require__(3));
-const child_process_1 = __webpack_require__(2);
+const path = __importStar(__webpack_require__(2));
+const child_process_1 = __webpack_require__(3);
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 /*
@@ -57,14 +57,32 @@ export function activate(context: vscode.ExtensionContext) {
 }
 */
 function activate(context) {
+    let outputChannel = vscode.window.createOutputChannel('AthenaCoder Output');
     let disposable = vscode.commands.registerCommand('athenacoder.helloWorld', () => {
         const extensionPath = context.extensionPath;
-        const executablePath = path.join(extensionPath, 'resources', 'main');
-        const modelPath = path.join(extensionPath, 'resources', 'stable-code-3b.gguf');
+        const executablePath = path.join(extensionPath, 'resources', 'main', "main");
+        const modelPath = path.join(extensionPath, 'resources', 'main', 'stable-code-3b.gguf');
         const command = `${executablePath} -m ${modelPath} -n -1 -p "write a bubble sort in c"`;
         (0, child_process_1.exec)(command, (error, stdout, stderr) => {
-            // ... handle the output
+            if (error) {
+                outputChannel.appendLine(`Error: ${error.message}`);
+                return;
+            }
+            if (stderr) {
+                outputChannel.appendLine(`Stderr: ${stderr}`);
+                return;
+            }
+            outputChannel.appendLine(`Output: ${stdout}`);
+            outputChannel.show(true); // This brings the output channel into focus
         });
+    });
+    context.subscriptions.push(disposable);
+    disposable = vscode.commands.registerCommand('extension.myContextMenuCommand', function () {
+        const editor = vscode.window.activeTextEditor;
+        if (editor) {
+            // Your code here. For example, manipulate the editor's text.
+            vscode.window.showInformationMessage('Context menu command executed!');
+        }
     });
     context.subscriptions.push(disposable);
 }
@@ -84,13 +102,13 @@ module.exports = require("vscode");
 /* 2 */
 /***/ ((module) => {
 
-module.exports = require("child_process");
+module.exports = require("path");
 
 /***/ }),
 /* 3 */
 /***/ ((module) => {
 
-module.exports = require("path");
+module.exports = require("child_process");
 
 /***/ })
 /******/ 	]);

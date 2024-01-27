@@ -16,8 +16,18 @@
       {
         "command": "athenacoder.helloWorld",
         "title": "Hello World"
+      },
+      {
+        "command": "extension.myContextMenuCommand",
+        "title": "My Context Menu Command"
       }
     ],
+    "menus": {
+      "editor/context": [{
+          "when": "editorTextFocus",
+          "command": "extension.myContextMenuCommand"
+      }]
+    },
     "activationEvents": [
       "onCommand:athenacoder.helloWorld"
     ]

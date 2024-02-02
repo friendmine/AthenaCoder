@@ -68,11 +68,21 @@ function activate(context) {
             vscode.window.showInformationMessage('No text selected or text is too short.');
             return;
         }
+        const start = new vscode.Position(selection.start.line, selection.start.character); // Identify the start position of the selection
+        const end = new vscode.Position(selection.end.line, selection.end.character); // Identify the end position of the selection
+        let insertPosition = start;
+        if (commandType === "aicode") {
+            let insertPosition = end;
+        }
+        else if (commandType === "aicomment") {
+            let insertPosition = start;
+        }
         const command = generateCommand(context, commandType, text);
         (0, child_process_1.exec)(command, (error, stdout, stderr) => {
             if (stdout) {
                 editor.edit(editBuilder => {
-                    editBuilder.insert(editor.selection.active, stdout); // Inserting at the current selection position
+                    editBuilder.insert(insertPosition, stdout);
+                    //editBuilder.insert(editor.selection.active, stdout); // Inserting at the current selection position
                 });
             }
             if (error) {

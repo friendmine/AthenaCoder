@@ -35,35 +35,26 @@ exports.deactivate = exports.activate = void 0;
 const vscode = __importStar(__webpack_require__(1));
 const path = __importStar(__webpack_require__(2));
 const child_process_1 = __webpack_require__(3);
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
-/*
-export function activate(context: vscode.ExtensionContext) {
-
-    // Use the console to output diagnostic information (console.log) and errors (console.error)
-    // This line of code will only be executed once when your extension is activated
-    console.log('Congratulations, your extension "athenacoder" is now active!');
-
-    // The command has been defined in the package.json file
-    // Now provide the implementation of the command with registerCommand
-    // The commandId parameter must match the command field in package.json
-    let disposable = vscode.commands.registerCommand('athenacoder.helloWorld', () => {
-        // The code you place here will be executed every time your command is executed
-        // Display a message box to the user
-        vscode.window.showInformationMessage('Hello World from AthenaCoder!');
-    });
-
-    context.subscriptions.push(disposable);
-}
-*/
 function activate(context) {
     let outputChannel = vscode.window.createOutputChannel('AthenaCoder Output');
     let disposable = vscode.commands.registerCommand('athenacoder.helloWorld', () => {
         const extensionPath = context.extensionPath;
         const executablePath = path.join(extensionPath, 'resources', 'main', "main");
         const modelPath = path.join(extensionPath, 'resources', 'main', 'stable-code-3b.gguf');
-        const command = `${executablePath} -m ${modelPath} -n -1 -p "write a bubble sort in c"`;
+        const logPath = path.join(extensionPath, 'resources');
+        const command = `${executablePath} -m ${modelPath} --logdir /tmp  -n -1 -p "write a bubble sort in c"`;
         (0, child_process_1.exec)(command, (error, stdout, stderr) => {
+            if (stdout) {
+                const editor = vscode.window.activeTextEditor;
+                if (!editor) {
+                    vscode.window.showInformationMessage('No active editor!');
+                    return; // No open text editor
+                }
+                const position = editor.selection.active; // Current cursor position
+                editor.edit(editBuilder => {
+                    editBuilder.insert(position, stdout); // Insert text at current cursor position
+                });
+            }
             if (error) {
                 outputChannel.appendLine(`Error: ${error.message}`);
                 return;

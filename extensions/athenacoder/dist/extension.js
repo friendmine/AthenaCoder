@@ -30,29 +30,49 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.deactivate = exports.activate = void 0;
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 const vscode = __importStar(__webpack_require__(1));
 const path = __importStar(__webpack_require__(2));
 const child_process_1 = __webpack_require__(3);
+// Improved generateCommand function with TypeScript typing
+function generateCommand(context, commandType, processContent) {
+    const extensionPath = context.extensionPath;
+    const executablePath = path.join(extensionPath, 'resources', 'main', "main");
+    const modelPath = path.join(extensionPath, 'resources', 'main', 'stable-code-3b.gguf');
+    const logPath = path.join(extensionPath, 'resources'); // Note: logPath is defined but not used
+    let command = '';
+    if (commandType === "aicode") {
+        command = `${executablePath} -m ${modelPath} --logdir /tmp -n -1 -p "generate a source code according the following description \n${processContent}"`;
+    }
+    else if (commandType === "aicomment") {
+        command = `${executablePath} -m ${modelPath} --logdir /tmp -n -1 -p "generate a comment according the following code \n${processContent}"`;
+    }
+    return command;
+}
 function activate(context) {
     let outputChannel = vscode.window.createOutputChannel('AthenaCoder Output');
+    // Registering a helloWorld command
     let disposable = vscode.commands.registerCommand('athenacoder.helloWorld', () => {
-        const extensionPath = context.extensionPath;
-        const executablePath = path.join(extensionPath, 'resources', 'main', "main");
-        const modelPath = path.join(extensionPath, 'resources', 'main', 'stable-code-3b.gguf');
-        const logPath = path.join(extensionPath, 'resources');
-        const command = `${executablePath} -m ${modelPath} --logdir /tmp  -n -1 -p "write a bubble sort in c"`;
+        vscode.window.showInformationMessage('Hello World from AthenaCoder!');
+    });
+    context.subscriptions.push(disposable);
+    // Function to execute command and handle output
+    const executeAndHandleCommand = (commandType) => {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            vscode.window.showInformationMessage('No active editor!');
+            return;
+        }
+        const selection = editor.selection;
+        const text = editor.document.getText(selection);
+        if (!text || text.length < 1) {
+            vscode.window.showInformationMessage('No text selected or text is too short.');
+            return;
+        }
+        const command = generateCommand(context, commandType, text);
         (0, child_process_1.exec)(command, (error, stdout, stderr) => {
             if (stdout) {
-                const editor = vscode.window.activeTextEditor;
-                if (!editor) {
-                    vscode.window.showInformationMessage('No active editor!');
-                    return; // No open text editor
-                }
-                const position = editor.selection.active; // Current cursor position
                 editor.edit(editBuilder => {
-                    editBuilder.insert(position, stdout); // Insert text at current cursor position
+                    editBuilder.insert(editor.selection.active, stdout); // Inserting at the current selection position
                 });
             }
             if (error) {
@@ -64,21 +84,17 @@ function activate(context) {
                 return;
             }
             outputChannel.appendLine(`Output: ${stdout}`);
-            outputChannel.show(true); // This brings the output channel into focus
+            outputChannel.show(true);
         });
-    });
+    };
+    // Registering the aicode command
+    disposable = vscode.commands.registerCommand('extension.aicode', () => executeAndHandleCommand("aicode"));
     context.subscriptions.push(disposable);
-    disposable = vscode.commands.registerCommand('extension.myContextMenuCommand', function () {
-        const editor = vscode.window.activeTextEditor;
-        if (editor) {
-            // Your code here. For example, manipulate the editor's text.
-            vscode.window.showInformationMessage('Context menu command executed!');
-        }
-    });
+    // Registering the aicomment command
+    disposable = vscode.commands.registerCommand('extension.aicomment', () => executeAndHandleCommand("aicomment"));
     context.subscriptions.push(disposable);
 }
 exports.activate = activate;
-// This method is called when your extension is deactivated
 function deactivate() { }
 exports.deactivate = deactivate;
 

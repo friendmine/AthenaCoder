@@ -18,14 +18,22 @@
         "title": "Hello World"
       },
       {
-        "command": "extension.myContextMenuCommand",
-        "title": "My Context Menu Command"
+        "command": "extension.aicode",
+        "title": "AI Code"
+      },
+      {
+        "command": "extension.aicomment",
+        "title": "AI Comment"
       }
     ],
     "menus": {
       "editor/context": [{
           "when": "editorTextFocus",
-          "command": "extension.myContextMenuCommand"
+          "command": "extension.aicode"
+      },
+      {
+        "when": "editorTextFocus",
+        "command": "extension.aicomment"
       }]
     },
     "activationEvents": [
